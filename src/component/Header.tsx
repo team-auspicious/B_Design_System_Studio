@@ -21,26 +21,15 @@ export const Header = () => {
   };
 
   return (
-    <Flex
-      w="1024px"
-      h="80px"
-      m="0 auto"
-      p="0 30px"
-      border="2px solid #000"
-      justify="space-between"
-      align="center"
-    >
-      <Heading size="md">Design System Studio</Heading>
-      <Flex>
-        <Button colorScheme="blue" mr="10px">
-          변경사항 저장
-        </Button>
-        <Select w="180px" variant="filled" value={menu} onChange={onChange}>
-          <option>-</option>
-          <option>Foundation</option>
-          <option>Component</option>
-        </Select>
+      <Flex w="1024px" h="80px" m="0 auto" p="0 30px" border="2px solid #000" justify="space-between" align="center">
+          <Heading size="md">Design System Studio</Heading>
+          <Flex>
+              <Select w="180px" variant="filled" value={menu} onChange={onChange}>
+                  <option>-</option>
+                  <option>Foundation</option>
+                  <option>Component</option>
+              </Select>
+          </Flex>
       </Flex>
-    </Flex>
   );
 };

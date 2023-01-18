@@ -38,9 +38,12 @@ export const Studio = () => {
     const currentMenu = useSelector((state: RootState) => state.target.menu);
     const currentItem = useSelector((state: RootState) => state.target.item);
     const versionList = useSelector((state: RootState) => state.foundation.foundationVersionList);
-    const selectRef = useRef<HTMLSelectElement>(null);
+    const selectedDetailOriginal = useSelector((state: RootState) => state.foundation.selectedfoundationDetail);
 
+    const [selectedDetail, setSelectedDetail] = useState<FoundataionDetail>();
     const [selectedVersionId, setSelectedVersion] = useState("");
+
+    const selectRef = useRef<HTMLSelectElement>(null);
 
     useEffect(() => {
         async function fetchFoundationVersionList() {
@@ -59,10 +62,33 @@ export const Studio = () => {
                 await fetch(`${API_URL}/foundation-detail/${id}`)
             ).json();
             dispatch(setFoundationDetail(foundationDetail));
+            setSelectedDetail(foundationDetail);
         }
 
         fetchFoundationDetail(selectedVersionId);
     }, [dispatch, selectedVersionId]);
+
+    function handleOnChangeValue(key: string, value: string) {
+        const nextDetail = { ...selectedDetail };
+        setSelectedDetail({
+            ...selectedDetail,
+            [currentItem as keyof FoundataionDetail]: {
+                ...(nextDetail[currentItem as keyof FoundataionDetail] as any),
+                [key]: value,
+            },
+        } as any);
+    }
+
+    function isUnChanged(original: FoundataionDetail, current: FoundataionDetail) {
+        return JSON.stringify(original) === JSON.stringify(current);
+    }
+
+    function handleClickSave() {
+        console.log(selectedDetail);
+    }
+
+    const list = selectedDetail?.[currentItem as keyof FoundataionDetail] ?? {};
+    const showButtonList = selectRef.current?.value ? true : false;
 
     return (
         <Box w="100%">
@@ -77,7 +103,6 @@ export const Studio = () => {
                             placeholder="버전을 선택해주세요."
                             ref={selectRef}
                             onChange={(e) => {
-                                console.log(e);
                                 setSelectedVersion(e.target.value);
                             }}
                         >
@@ -95,7 +120,7 @@ export const Studio = () => {
                             icon={<AddIcon />}
                         />
                     </Flex>
-                    {selectRef.current?.value
+                    {showButtonList
                         ? foundationList.map((item, index) => (
                               <Button
                                   w="250px"
@@ -110,6 +135,19 @@ export const Studio = () => {
                               </Button>
                           ))
                         : ""}
+                    {showButtonList ? (
+                        <Button
+                            colorScheme="blue"
+                            w="250px"
+                            mt="20px"
+                            disabled={isUnChanged(selectedDetailOriginal, selectedDetail!)}
+                            onClick={handleClickSave}
+                        >
+                            변경사항 저장
+                        </Button>
+                    ) : (
+                        ""
+                    )}
                 </Flex>
                 <Flex w="724px" p="20px 30px" border="2px solid #000" borderTop="0" borderLeft="0" direction="column">
                     {currentItem ? (
@@ -139,21 +177,21 @@ export const Studio = () => {
                                 </Table>
                             </TableContainer>
                             <Accordion allowMultiple>
-                                {colorList.map((item, index) => (
+                                {Object.entries(list).map(([key, value], index) => (
                                     <AccordionItem key={index} p="10px 0">
                                         <Flex justify="space-between">
                                             <Input
                                                 mr="75px"
                                                 type="text"
                                                 w="250px"
-                                                value={item.name}
+                                                value={key}
                                                 onChange={(e) => console.log(e)}
                                             />
                                             <Input
                                                 type="text"
                                                 w="250px"
-                                                value={item.value}
-                                                onChange={(e) => console.log(e)}
+                                                value={value}
+                                                onChange={(e) => handleOnChangeValue(key, e.target.value)}
                                             />
                                             <AccordionButton w="50px">
                                                 <AccordionIcon />
