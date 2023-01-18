@@ -28,8 +28,8 @@ import type { RootState } from "../redux/store";
 import { itemUpdate } from "../redux/createSlice";
 import { useDispatch, useSelector } from "react-redux";
 import { useEffect, useRef, useState } from "react";
-import { FoundationVersion } from "../constant/type";
-import { setFoundationVersionList } from "../redux/foundation";
+import { FoundataionDetail, FoundationVersion } from "../constant/type";
+import { setFoundationDetail, setFoundationVersionList } from "../redux/foundation";
 import { API_URL } from "../constant/api";
 
 export const Studio = () => {
@@ -48,7 +48,21 @@ export const Studio = () => {
             dispatch(setFoundationVersionList(versionList));
         }
         fetchFoundationVersionList();
-    }, []);
+    }, [dispatch]);
+
+    useEffect(() => {
+        async function fetchFoundationDetail(id: string) {
+            if (!id) {
+                return;
+            }
+            const foundationDetail: FoundataionDetail = await (
+                await fetch(`${API_URL}/foundation-detail/${id}`)
+            ).json();
+            dispatch(setFoundationDetail(foundationDetail));
+        }
+
+        fetchFoundationDetail(selectedVersionId);
+    }, [dispatch, selectedVersionId]);
 
     return (
         <Box w="100%">
@@ -89,7 +103,7 @@ export const Studio = () => {
                                   key={index}
                                   onClick={() => {
                                       dispatch(itemUpdate(item));
-                                      navigate(`/${currentMenu}/${item}`);
+                                      // navigate(`/${currentMenu}/${item}`);
                                   }}
                               >
                                   {item}
