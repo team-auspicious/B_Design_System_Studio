@@ -30,7 +30,7 @@ import { itemUpdate } from "../redux/createSlice";
 import { useDispatch, useSelector } from "react-redux";
 import { useEffect, useRef, useState } from "react";
 import { FoundataionDetail, FoundationVersion } from "../constant/type";
-import { setFoundationDetail, setFoundationVersionList } from "../redux/foundation";
+import { addFoundationVersion, setFoundationDetail, setFoundationVersionList } from "../redux/foundation";
 import { API_URL } from "../constant/api";
 
 export const Studio = () => {
@@ -41,6 +41,7 @@ export const Studio = () => {
     const versionList = useSelector((state: RootState) => state.foundation.foundationVersionList);
     const selectedDetailOriginal = useSelector((state: RootState) => state.foundation.selectedfoundationDetail);
 
+    const [nextVersion, setNextVersion] = useState("");
     const [selectedDetail, setSelectedDetail] = useState<FoundataionDetail>();
     const [selectedVersionId, setSelectedVersionId] = useState("");
     const [selectedVersion, setSelectedVersion] = useState<FoundationVersion>();
@@ -85,8 +86,18 @@ export const Studio = () => {
         return JSON.stringify(original) === JSON.stringify(current);
     }
 
-    async function handleClickSave() {
-        console.log(selectedDetail);
+    async function handleClickSave(e: any) {
+        e.preventDefault();
+        const response = await fetch(`${API_URL}/foundation-detail/`, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ ...selectedDetail, version: nextVersion }),
+        });
+
+        const nextFoundation: FoundationVersion = await response.json();
+        dispatch(addFoundationVersion(nextFoundation));
     }
 
     const list = selectedDetail?.[currentItem as keyof FoundataionDetail] ?? {};
@@ -117,9 +128,15 @@ export const Studio = () => {
                         </Select>
                     </Flex>
                     {selectedVersion && (
-                        <Badge mt="20px" fontSize="xl" colorScheme={selectedVersion?.status ? "green" : "red"}>
-                            {selectedVersion?.status ? "배포" : "배포 전"}
-                        </Badge>
+                        <Button
+                            w="250px"
+                            mt="20px"
+                            disabled={selectedVersion.status}
+                            colorScheme={selectedVersion?.status ? "green" : "red"}
+                            onClick={handleClickSave}
+                        >
+                            {selectedVersion?.status ? "배포 완료" : "배포 필요"}
+                        </Button>
                     )}
                     {showButtonList &&
                         foundationList.map((item, index) => (
@@ -143,15 +160,19 @@ export const Studio = () => {
                                 borderRightRadius="none"
                                 variant="filled"
                                 placeholder="버전을 입력해주세요."
-                                onChange={(e) => {}}
+                                onChange={(e) => {
+                                    setNextVersion(e.target.value);
+                                }}
                             ></Input>
                             <IconButton
+                                disabled={isUnChanged(selectedDetailOriginal, selectedDetail!) || !nextVersion}
                                 mt="20px"
                                 colorScheme="blue"
                                 borderLeftRadius="none"
                                 variant="outline"
                                 aria-label="version deploy"
                                 icon={<AddIcon />}
+                                onClick={handleClickSave}
                             />
                         </Flex>
                     )}

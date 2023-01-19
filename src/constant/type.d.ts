@@ -13,12 +13,3 @@ export interface FoundataionDetail {
     spacing: Record<string, string>;
     typography: Record<string, string>;
 }
-
-export interface StringifiedFoundationDetail {
-    color: string;
-    created_at: string;
-    foundation_id: string;
-    id: string;
-    spacing: string;
-    typography: string;
-}

@@ -1,6 +1,6 @@
 import { createSlice } from "@reduxjs/toolkit";
 import type { PayloadAction } from "@reduxjs/toolkit";
-import { FoundataionDetail, FoundationVersion, StringifiedFoundationDetail } from "../constant/type";
+import { FoundataionDetail, FoundationVersion } from "../constant/type";
 
 export interface FoundationDetailState {
     foundationVersionList: FoundationVersion[];
@@ -24,28 +24,12 @@ export const targetSlice = createSlice({
         setFoundationDetail: (state, action: PayloadAction<FoundataionDetail>) => {
             state.selectedfoundationDetail = action.payload;
         },
-
-        // setStringifyFoundationDetail: (state, action: PayloadAction<StringifiedFoundationDetail>) => {
-        //     state.stringifyFoundationDetail = action.payload;
-        // },
-        // updateStringifyFoundationDetail: (state, action: PayloadAction<{ item: string; value: string }>) => {
-        //     const { item, value } = action.payload;
-        //     if (state.stringifyFoundationDetail) {
-        //         state.stringifyFoundationDetail[item as keyof StringifiedFoundationDetail] = value;
-        //     }
-        // },
-        // setIsUpdated: (state, action: PayloadAction<boolean>) => {
-        //     state.isUpdated = action.payload;
-        // },
+        addFoundationVersion: (state, action: PayloadAction<FoundationVersion>) => {
+            state.foundationVersionList.push(action.payload);
+        },
     },
 });
 
-export const {
-    setFoundationDetail,
-    setFoundationVersionList,
-    // setStringifyFoundationDetail,
-    // updateStringifyFoundationDetail,
-    // setIsUpdated,
-} = targetSlice.actions;
+export const { setFoundationDetail, setFoundationVersionList, addFoundationVersion } = targetSlice.actions;
 
 export default targetSlice.reducer;

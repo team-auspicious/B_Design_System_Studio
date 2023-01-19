@@ -1,4 +1,4 @@
-export const foundationList = ["color", "spacing", "typography", "iconography"];
+export const foundationList = ["color", "spacing", "typography", "layout"];
 
 export const colorList = [
     {
