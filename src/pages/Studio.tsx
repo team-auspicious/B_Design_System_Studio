@@ -1,25 +1,26 @@
 import { ChevronRightIcon, AddIcon } from "@chakra-ui/icons";
 import {
-  Box,
-  Select,
-  Flex,
-  Button,
-  IconButton,
-  Breadcrumb,
-  BreadcrumbItem,
-  BreadcrumbLink,
-  Table,
-  Thead,
-  Tr,
-  Th,
-  TableContainer,
-  Input,
-  Accordion,
-  AccordionItem,
-  AccordionButton,
-  AccordionPanel,
-  AccordionIcon,
-  useBoolean,
+    Box,
+    Select,
+    Flex,
+    Button,
+    IconButton,
+    Breadcrumb,
+    BreadcrumbItem,
+    BreadcrumbLink,
+    Table,
+    Thead,
+    Tr,
+    Th,
+    TableContainer,
+    Input,
+    Accordion,
+    AccordionItem,
+    AccordionButton,
+    AccordionPanel,
+    AccordionIcon,
+    useBoolean,
+    Badge,
 } from "@chakra-ui/react";
 import { Header } from "../component/Header";
 import { useNavigate } from "react-router-dom";
@@ -41,7 +42,8 @@ export const Studio = () => {
     const selectedDetailOriginal = useSelector((state: RootState) => state.foundation.selectedfoundationDetail);
 
     const [selectedDetail, setSelectedDetail] = useState<FoundataionDetail>();
-    const [selectedVersionId, setSelectedVersion] = useState("");
+    const [selectedVersionId, setSelectedVersionId] = useState("");
+    const [selectedVersion, setSelectedVersion] = useState<FoundationVersion>();
 
     const selectRef = useRef<HTMLSelectElement>(null);
 
@@ -83,7 +85,7 @@ export const Studio = () => {
         return JSON.stringify(original) === JSON.stringify(current);
     }
 
-    function handleClickSave() {
+    async function handleClickSave() {
         console.log(selectedDetail);
     }
 
@@ -97,13 +99,14 @@ export const Studio = () => {
                 <Flex w="300px" p="20px 0" border="2px solid #000" borderTop="0" direction="column" align="center">
                     <Flex>
                         <Select
-                            w="210px"
+                            w="250px"
                             borderRightRadius="none"
                             variant="filled"
                             placeholder="버전을 선택해주세요."
                             ref={selectRef}
                             onChange={(e) => {
-                                setSelectedVersion(e.target.value);
+                                setSelectedVersionId(e.target.value);
+                                setSelectedVersion(versionList.find((version) => version.id === e.target.value));
                             }}
                         >
                             {versionList.map(({ id, semantic_version, status }, index) => (
@@ -112,41 +115,45 @@ export const Studio = () => {
                                 </option>
                             ))}
                         </Select>
-                        <IconButton
-                            colorScheme="blue"
-                            borderLeftRadius="none"
-                            variant="outline"
-                            aria-label="version deploy"
-                            icon={<AddIcon />}
-                        />
                     </Flex>
-                    {showButtonList
-                        ? foundationList.map((item, index) => (
-                              <Button
-                                  w="250px"
-                                  mt="20px"
-                                  key={index}
-                                  onClick={() => {
-                                      dispatch(itemUpdate(item));
-                                      // navigate(`/${currentMenu}/${item}`);
-                                  }}
-                              >
-                                  {item}
-                              </Button>
-                          ))
-                        : ""}
-                    {showButtonList ? (
-                        <Button
-                            colorScheme="blue"
-                            w="250px"
-                            mt="20px"
-                            disabled={isUnChanged(selectedDetailOriginal, selectedDetail!)}
-                            onClick={handleClickSave}
-                        >
-                            변경사항 저장
-                        </Button>
-                    ) : (
-                        ""
+                    {selectedVersion && (
+                        <Badge mt="20px" fontSize="xl" colorScheme={selectedVersion?.status ? "green" : "red"}>
+                            {selectedVersion?.status ? "배포" : "배포 전"}
+                        </Badge>
+                    )}
+                    {showButtonList &&
+                        foundationList.map((item, index) => (
+                            <Button
+                                w="250px"
+                                mt="20px"
+                                key={index}
+                                onClick={() => {
+                                    dispatch(itemUpdate(item));
+                                    // navigate(`/${currentMenu}/${item}`);
+                                }}
+                            >
+                                {item}
+                            </Button>
+                        ))}
+                    {showButtonList && (
+                        <Flex>
+                            <Input
+                                mt="20px"
+                                w="210px"
+                                borderRightRadius="none"
+                                variant="filled"
+                                placeholder="버전을 입력해주세요."
+                                onChange={(e) => {}}
+                            ></Input>
+                            <IconButton
+                                mt="20px"
+                                colorScheme="blue"
+                                borderLeftRadius="none"
+                                variant="outline"
+                                aria-label="version deploy"
+                                icon={<AddIcon />}
+                            />
+                        </Flex>
                     )}
                 </Flex>
                 <Flex w="724px" p="20px 30px" border="2px solid #000" borderTop="0" borderLeft="0" direction="column">
